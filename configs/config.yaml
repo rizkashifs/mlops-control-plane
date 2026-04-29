@@ -1,0 +1,11 @@
+project:
+  name: mlops-control-plane
+registry:
+  backend: metadata-store-placeholder
+approval:
+  required_stages:
+    - validation
+    - risk_review
+    - production_approval
+lineage:
+  enabled: true
