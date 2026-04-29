@@ -17,14 +17,28 @@ from fastapi import FastAPI, HTTPException, Query
 from pydantic import BaseModel
 from typing import Optional
 
+import os
+
 from ..core.models import ApprovalStage, LifecycleState, ValidationEvidence
 from ..core.registry import ModelRegistry
+from ..core.registry_sql import SQLModelRegistry
+from ..core.registry_mlflow import MLflowModelRegistry
 from ..core.lineage import LineageStore
 from ..pipelines import workflows
 
 app = FastAPI(title="MLOps Control Plane")
 
-registry = ModelRegistry()
+
+def _make_registry():
+    backend = os.environ.get("REGISTRY_BACKEND", "memory")
+    if backend == "sql":
+        return SQLModelRegistry()
+    if backend == "mlflow":
+        return MLflowModelRegistry()
+    return ModelRegistry()
+
+
+registry = _make_registry()
 lineage = LineageStore()
 
 

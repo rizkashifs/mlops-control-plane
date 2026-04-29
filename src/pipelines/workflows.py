@@ -3,6 +3,9 @@ Lifecycle workflow functions.
 
 Each function represents one step in the model lifecycle:
   register → validate → review → approve → promote → retire
+
+All registry backends (memory, SQL, MLflow) are supported — any object
+that implements register / get / list_models / save works here.
 """
 
 from ..core.models import (
@@ -47,11 +50,12 @@ def attach_validation_evidence(
 ) -> None:
     model = registry.get(model_id)
     model.validation_evidence.extend(evidence)
-    # Move to IN_REVIEW only if all evidence passed
-    if all(e.passed for e in model.validation_evidence):
-        registry.update_state(model_id, LifecycleState.IN_REVIEW)
-    else:
-        registry.update_state(model_id, LifecycleState.REJECTED)
+    model.state = (
+        LifecycleState.IN_REVIEW
+        if all(e.passed for e in model.validation_evidence)
+        else LifecycleState.REJECTED
+    )
+    registry.save(model)
 
 
 def approve_model(
@@ -72,7 +76,9 @@ def approve_model(
     approved_stages = {a.stage for a in model.approvals if a.approved}
     required = {ApprovalStage.VALIDATION, ApprovalStage.RISK_REVIEW, ApprovalStage.PRODUCTION_APPROVAL}
     if required.issubset(approved_stages):
-        registry.update_state(model_id, LifecycleState.APPROVED)
+        model.state = LifecycleState.APPROVED
+
+    registry.save(model)
 
 
 def reject_model(
@@ -86,7 +92,8 @@ def reject_model(
     model.approvals.append(
         ApprovalRecord(stage=stage, approved=False, reviewer=reviewer, notes=notes)
     )
-    registry.update_state(model_id, LifecycleState.REJECTED)
+    model.state = LifecycleState.REJECTED
+    registry.save(model)
 
 
 def promote_model(
@@ -98,11 +105,13 @@ def promote_model(
     if model.state != LifecycleState.APPROVED:
         raise ValueError(f"Model must be APPROVED before promotion, current state: '{model.state}'")
     model.deployed_to = environment
-    registry.update_state(model_id, LifecycleState.DEPLOYED)
+    model.state = LifecycleState.DEPLOYED
+    registry.save(model)
 
 
 def retire_model(registry: ModelRegistry, model_id: str) -> None:
     model = registry.get(model_id)
     if model.state != LifecycleState.DEPLOYED:
         raise ValueError(f"Only DEPLOYED models can be retired, current state: '{model.state}'")
-    registry.update_state(model_id, LifecycleState.RETIRED)
+    model.state = LifecycleState.RETIRED
+    registry.save(model)

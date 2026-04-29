@@ -23,5 +23,5 @@ class ModelRegistry:
             models = [m for m in models if m.state == state]
         return models
 
-    def update_state(self, model_id: str, new_state: LifecycleState) -> None:
-        self.get(model_id).state = new_state
+    def save(self, model: ModelRecord) -> None:
+        self._models[model.model_id] = model
