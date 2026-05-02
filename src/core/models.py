@@ -51,6 +51,18 @@ class ModelRecord:
     approvals: list[ApprovalRecord] = field(default_factory=list)
     deployed_to: Optional[str] = None
     tags: dict[str, str] = field(default_factory=dict)
+    model_card: Optional["ModelCard"] = None
+
+
+@dataclass
+class ModelCard:
+    """Structured documentation required for responsible AI governance review."""
+    intended_use: str
+    training_data_description: str = ""
+    known_limitations: str = ""
+    out_of_scope_use: str = ""
+    ethical_considerations: str = ""
+    contact: str = ""
 
 
 @dataclass

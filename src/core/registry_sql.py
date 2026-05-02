@@ -11,10 +11,13 @@ from typing import Optional
 from sqlalchemy import create_engine, Column, String, DateTime, JSON
 from sqlalchemy.orm import DeclarativeBase, Session
 
+import dataclasses
+
 from .models import (
     ApprovalRecord,
     ApprovalStage,
     LifecycleState,
+    ModelCard,
     ModelRecord,
     ValidationEvidence,
 )
@@ -38,6 +41,7 @@ class _ModelRow(_Base):
     tags = Column(JSON, default={})
     validation_evidence = Column(JSON, default=[])
     approvals = Column(JSON, default=[])
+    model_card = Column(JSON, nullable=True)
 
 
 class SQLModelRegistry:
@@ -88,6 +92,7 @@ class SQLModelRegistry:
             row.deployed_to = model.deployed_to
             row.validation_evidence = [_evidence_to_dict(e) for e in model.validation_evidence]
             row.approvals = [_approval_to_dict(a) for a in model.approvals]
+            row.model_card = dataclasses.asdict(model.model_card) if model.model_card else None
             session.commit()
 
 
@@ -115,6 +120,7 @@ def _row_to_record(row: _ModelRow) -> ModelRecord:
         deployed_to=row.deployed_to,
         tags=row.tags or {},
     )
+    model.model_card = ModelCard(**row.model_card) if row.model_card else None
     model.validation_evidence = [
         ValidationEvidence(**d) for d in (row.validation_evidence or [])
     ]

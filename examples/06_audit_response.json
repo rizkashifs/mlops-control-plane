@@ -1,0 +1,79 @@
+{
+  "_comment": "Sample response from GET /audit/{model_id} — the full immutable trail for one model",
+  "events": [
+    {
+      "event_id": "e1a2b3c4-0001",
+      "model_id": "f8d9e0a1-...",
+      "event_type": "registered",
+      "actor": "risk-ml-team",
+      "from_state": null,
+      "to_state": "candidate",
+      "details": {
+        "name": "fraud-detector",
+        "version": "2.1.0",
+        "artifact_uri": "s3://ml-artifacts/fraud-detector/2.1.0/model.pkl"
+      },
+      "timestamp": "2025-05-01T09:00:00Z"
+    },
+    {
+      "event_id": "e1a2b3c4-0002",
+      "model_id": "f8d9e0a1-...",
+      "event_type": "model_card_attached",
+      "actor": "alice@example.com",
+      "from_state": null,
+      "to_state": null,
+      "details": { "intended_use": "Real-time fraud detection..." },
+      "timestamp": "2025-05-01T09:15:00Z"
+    },
+    {
+      "event_id": "e1a2b3c4-0003",
+      "model_id": "f8d9e0a1-...",
+      "event_type": "evidence_attached",
+      "actor": "system",
+      "from_state": "candidate",
+      "to_state": "in_review",
+      "details": { "evidence_count": 4, "all_passed": true },
+      "timestamp": "2025-05-01T09:30:00Z"
+    },
+    {
+      "event_id": "e1a2b3c4-0004",
+      "model_id": "f8d9e0a1-...",
+      "event_type": "stage_approved",
+      "actor": "alice@example.com",
+      "from_state": "in_review",
+      "to_state": "in_review",
+      "details": { "stage": "validation", "notes": "All metrics exceed thresholds." },
+      "timestamp": "2025-05-01T10:00:00Z"
+    },
+    {
+      "event_id": "e1a2b3c4-0005",
+      "model_id": "f8d9e0a1-...",
+      "event_type": "stage_approved",
+      "actor": "bob@example.com",
+      "from_state": "in_review",
+      "to_state": "in_review",
+      "details": { "stage": "risk_review", "notes": "Fairness report reviewed. Approved." },
+      "timestamp": "2025-05-01T11:00:00Z"
+    },
+    {
+      "event_id": "e1a2b3c4-0006",
+      "model_id": "f8d9e0a1-...",
+      "event_type": "stage_approved",
+      "actor": "carol@example.com",
+      "from_state": "in_review",
+      "to_state": "approved",
+      "details": { "stage": "production_approval", "notes": "Shadow test passed." },
+      "timestamp": "2025-05-01T14:00:00Z"
+    },
+    {
+      "event_id": "e1a2b3c4-0007",
+      "model_id": "f8d9e0a1-...",
+      "event_type": "promoted",
+      "actor": "deploy-bot@example.com",
+      "from_state": "approved",
+      "to_state": "deployed",
+      "details": { "environment": "production" },
+      "timestamp": "2025-05-01T15:00:00Z"
+    }
+  ]
+}

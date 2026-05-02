@@ -1,0 +1,24 @@
+{
+  "_comment": "Three sequential POST calls to /models/{model_id}/approve. All three stages are required before the model reaches APPROVED state.",
+
+  "step_1_validation": {
+    "_endpoint": "POST /models/{model_id}/approve",
+    "stage": "validation",
+    "reviewer": "alice@example.com",
+    "notes": "All metrics exceed thresholds. Holdout evaluation confirmed."
+  },
+
+  "step_2_risk_review": {
+    "_endpoint": "POST /models/{model_id}/approve",
+    "stage": "risk_review",
+    "reviewer": "bob@example.com",
+    "notes": "Fairness report reviewed. False-positive disparity within policy limits. Approved."
+  },
+
+  "step_3_production_approval": {
+    "_endpoint": "POST /models/{model_id}/approve",
+    "stage": "production_approval",
+    "reviewer": "carol@example.com",
+    "notes": "Platform capacity confirmed. Shadow deployment test passed. Approved for production."
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "_comment": "POST /models/{model_id}/validate — attach metric evidence from the evaluation run",
+  "evidence": [
+    {
+      "metric_name": "accuracy",
+      "metric_value": 0.9312,
+      "passed": true,
+      "notes": "Evaluated on holdout set (Oct–Dec 2024)"
+    },
+    {
+      "metric_name": "f1",
+      "metric_value": 0.8876,
+      "passed": true,
+      "notes": "Macro-averaged across fraud / not-fraud classes"
+    },
+    {
+      "metric_name": "false_positive_rate",
+      "metric_value": 0.034,
+      "passed": true,
+      "notes": "Threshold 0.5, acceptable for production SLA"
+    },
+    {
+      "metric_name": "auc_roc",
+      "metric_value": 0.9541,
+      "passed": true
+    }
+  ]
+}
