@@ -1,0 +1,14 @@
+{
+  "_comment": "Promote to production, then retire when the next version is ready.",
+
+  "promote": {
+    "_endpoint": "POST /models/{model_id}/promote",
+    "environment": "production",
+    "actor": "deploy-bot@example.com"
+  },
+
+  "retire": {
+    "_endpoint": "POST /models/{model_id}/retire",
+    "actor": "deploy-bot@example.com"
+  }
+}

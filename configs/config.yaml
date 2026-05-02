@@ -1,11 +1,27 @@
 project:
   name: mlops-control-plane
+  environment: development   # development | staging | production
+
 registry:
-  backend: metadata-store-placeholder
+  backend: memory            # memory | sql | mlflow
+  sql_url: sqlite:///./control_plane.db
+  mlflow_tracking_uri: ./mlruns
+
 approval:
   required_stages:
     - validation
     - risk_review
     - production_approval
+
 lineage:
   enabled: true
+
+# Metric thresholds used to auto-evaluate validation evidence.
+# A metric below its threshold causes the evidence item to fail.
+metrics:
+  thresholds:
+    accuracy: 0.85
+    f1: 0.80
+    precision: 0.80
+    recall: 0.80
+    auc_roc: 0.85

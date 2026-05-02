@@ -1,0 +1,16 @@
+{
+  "_comment": "POST /models — register a new model candidate",
+  "name": "fraud-detector",
+  "version": "2.1.0",
+  "owner": "risk-ml-team",
+  "artifact_uri": "s3://ml-artifacts/fraud-detector/2.1.0/model.pkl",
+  "experiment_id": "mlflow-exp-00142",
+  "dataset_version": "transactions-2024-Q4-v3",
+  "parent_model_id": "a1b2c3d4-...",
+  "tags": {
+    "team": "risk",
+    "model_type": "xgboost",
+    "use_case": "fraud_detection",
+    "training_job": "job-2025-05-01-0342"
+  }
+}

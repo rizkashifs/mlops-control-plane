@@ -1,0 +1,10 @@
+{
+  "_comment": "POST /models/{model_id}/card — attach governance documentation before review",
+  "intended_use": "Real-time fraud detection for card-not-present transactions. Scores each transaction 0–1; scores above 0.5 trigger a manual review queue.",
+  "training_data_description": "12 months of anonymised card transactions (Jan–Dec 2024), ~4.2M rows, 0.8% fraud prevalence. PII removed. Dataset version: transactions-2024-Q4-v3.",
+  "known_limitations": "Performance degrades on transactions from merchants first seen after Nov 2024 (cold-start). Not evaluated on transactions outside the US and EU.",
+  "out_of_scope_use": "Not intended for credit scoring, identity verification, or any use case outside payment fraud detection.",
+  "ethical_considerations": "Model was evaluated for demographic parity across age and geography segments. Disparity in false-positive rate < 2% across evaluated groups. Full fairness report in Confluence: /ml-fairness/fraud-2.1.0.",
+  "contact": "risk-ml-team@example.com",
+  "actor": "alice@example.com"
+}
