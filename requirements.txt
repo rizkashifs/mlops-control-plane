@@ -3,5 +3,6 @@ sqlalchemy
 mlflow
 pydantic
 pyyaml
-prefect
 pytest
+uvicorn
+httpx
