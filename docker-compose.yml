@@ -1,0 +1,45 @@
+version: '3.8'
+
+services:
+  # In-memory backend (default, no persistence)
+  app-memory:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      REGISTRY_BACKEND: memory
+    container_name: mlops-control-plane-memory
+
+  # SQL backend (persistent SQLite)
+  app-sql:
+    build: .
+    ports:
+      - "8001:8000"
+    environment:
+      REGISTRY_BACKEND: sql
+    volumes:
+      - ./data:/app/data
+    container_name: mlops-control-plane-sql
+
+  # MLflow backend with MLflow server
+  mlflow-server:
+    image: ghcr.io/mlflow/mlflow:latest
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./mlruns:/mlruns
+    command: mlflow server --host 0.0.0.0 --port 5000 --backend-store-uri sqlite:///./mlflow.db
+    container_name: mlflow-server
+
+  app-mlflow:
+    build: .
+    ports:
+      - "8002:8000"
+    environment:
+      REGISTRY_BACKEND: mlflow
+      MLFLOW_TRACKING_URI: http://mlflow-server:5000
+    depends_on:
+      - mlflow-server
+    volumes:
+      - ./mlruns:/app/mlruns
+    container_name: mlops-control-plane-mlflow

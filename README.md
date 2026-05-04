@@ -108,6 +108,41 @@ make test       # run all tests
 
 ---
 
+## Docker
+
+Run in a container with any backend:
+
+**In-memory backend (no persistence):**
+```bash
+docker build -t mlops-control-plane .
+docker run -p 8000:8000 -e REGISTRY_BACKEND=memory mlops-control-plane
+```
+
+**All backends at once (docker-compose):**
+```bash
+docker-compose up
+
+# Now you have:
+# - app-memory    at http://localhost:8000/docs (in-memory, no persistence)
+# - app-sql       at http://localhost:8001/docs (SQLite, data/ volume)
+# - mlflow-server at http://localhost:5000 (MLflow UI)
+# - app-mlflow    at http://localhost:8002/docs (MLflow backend)
+```
+
+**Run a specific backend:**
+```bash
+docker-compose up app-sql      # SQLite only
+docker-compose up app-mlflow   # MLflow + MLflow server
+```
+
+**Tear down:**
+```bash
+docker-compose down
+docker volume prune  # Clean up volumes if needed
+```
+
+---
+
 ## Full lifecycle example
 
 ```bash
@@ -230,6 +265,9 @@ metrics:
 mlops-control-plane/
 ├── main.py                     Entry point — starts the API server
 ├── Makefile                    Common tasks: run, test, example, openapi
+├── Dockerfile                  Container image definition
+├── docker-compose.yml          Multi-backend service setup
+├── .dockerignore                Files excluded from image
 ├── requirements.txt
 ├── openapi.json                Machine-readable API spec
 ├── configs/
