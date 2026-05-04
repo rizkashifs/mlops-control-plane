@@ -4,16 +4,77 @@ A working control plane for managing ML model lifecycle, governance approvals, l
 
 ---
 
+## Control Plane vs Data Plane
+
+This is a **control plane**, not a data plane:
+
+| Aspect | Control Plane (this project) | Data Plane |
+|--------|-----|----------|
+| **Purpose** | Manages state, approvals, and audit trail | Executes predictions or inference |
+| **Role** | "Is this model approved for production?" | "What prediction does this model make?" |
+| **Data** | Model metadata, governance records, event log | Input features, model scores, predictions |
+| **Latency** | Humans approve (hours/days) | Milliseconds (real-time) |
+| **Storage** | Registry (who, when, why) | Feature store / prediction cache |
+| **Example** | Register candidate → attach evidence → 3-stage approval → deploy | Load model → run inference → return score |
+
+This control plane **coordinates** between training pipelines (which produce candidates), governance teams (who approve), and deployment systems (which execute). It does not train models or serve predictions itself.
+
+---
+
 ## What it does
 
 Tracks every model from the moment a training pipeline produces a candidate artifact through validation, multi-stage governance review, production deployment, and retirement. It does **not** train models or serve predictions — it manages state, metadata, approvals, and the audit trail.
 
+**Lifecycle flow:**
+
 ```
-Training Pipeline     →   register_model_candidate   →   CANDIDATE
-Evaluation Pipeline   →   attach_validation_evidence  →   IN_REVIEW
-Governance Reviewers  →   approve_model (×3 stages)   →   APPROVED
-Deploy Bot            →   promote_model               →   DEPLOYED
-Next Version Ready    →   retire_model                →   RETIRED
+┌─────────────────────────────────────────────────────────────────┐
+│                    Model Lifecycle State Machine                 │
+└─────────────────────────────────────────────────────────────────┘
+
+    register_model_candidate()
+           │
+           ▼
+       CANDIDATE
+           │
+           ├─ attach_validation_evidence()
+           │  (all metrics pass)
+           │
+           ▼
+       IN_REVIEW
+           │
+           ├─ approve_model() × 3 stages
+           │  (validation → risk_review → production_approval)
+           │
+           ▼
+       APPROVED
+           │
+           ├─ promote_model()
+           │
+           ▼
+       DEPLOYED
+           │
+           ├─ retire_model()
+           │
+           ▼
+       RETIRED
+
+    ⚠️  REJECTED branch (if any approval fails):
+           CANDIDATE ──→ IN_REVIEW ──→ REJECTED
+```
+
+**Example: A real governance workflow**
+
+```
+Training Pipeline     →   register_model_candidate(fraud-detector v2.1.0)   →   CANDIDATE
+Model Author          →   attach_model_card(intended_use, limitations, ...)   →   (still CANDIDATE)
+Evaluation Pipeline   →   attach_validation_evidence(accuracy, f1, auc, ...)  →   IN_REVIEW
+Data Governance       →   approve_model(VALIDATION_STAGE)                      →   (still IN_REVIEW)
+Risk Compliance       →   approve_model(RISK_REVIEW_STAGE)                     →   (still IN_REVIEW)
+DevOps Lead           →   approve_model(PRODUCTION_APPROVAL_STAGE)             →   APPROVED
+Deploy Bot            →   promote_model(environment="production")              →   DEPLOYED
+6 months later...
+Platform Team         →   retire_model()                                       →   RETIRED
 ```
 
 ---
